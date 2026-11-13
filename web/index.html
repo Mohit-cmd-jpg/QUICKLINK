@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QuickLink | URL Shortener</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <p class="eyebrow">QUICKLINK</p>
+      <h1>Share less.<br><span>Go further.</span></h1>
+      <p class="intro">Turn long URLs into simple, memorable links in seconds.</p>
+      <form id="shorten-form">
+        <label for="url">Paste your long URL</label>
+        <div class="url-input">
+          <input id="url" name="url" type="url" placeholder="https://example.com/your-long-link" required>
+          <button type="submit">Shorten URL <span aria-hidden="true">→</span></button>
+        </div>
+      </form>
+      <div id="result" class="result" hidden></div>
+      <p id="message" class="message" role="status"></p>
+    </section>
+    <section class="info">
+      <div><strong>Fast</strong><span>Instant redirects</span></div>
+      <div><strong>Simple</strong><span>No account required</span></div>
+      <div><strong>Private</strong><span>Basic, anonymous stats</span></div>
+    </section>
+  </main>
+  <script>
+    const form = document.querySelector("#shorten-form");
+    const result = document.querySelector("#result");
+    const message = document.querySelector("#message");
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      message.textContent = "Creating your short link…";
+      result.hidden = true;
+      try {
+        const response = await fetch("/api/urls", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({url: form.url.value})
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Could not create link");
+        result.innerHTML = `<span>Your short link</span><a href="${data.short_url}">${data.short_url}</a>`;
+        result.hidden = false;
+        message.textContent = "";
+      } catch (error) {
+        message.textContent = error.message;
+      }
+    });
+  </script>
+</body>
+</html>
