@@ -254,8 +254,12 @@ func main() {
 	}
 	addr := os.Getenv("QUICKLINK_ADDR")
 	if addr == "" {
-		addr = ":8080"
+		port := os.Getenv("PORT")
+		if port == "" {
+			port = "8080"
+		}
+		addr = ":" + port
 	}
-	log.Printf("QuickLink listening on http://localhost%s", addr)
+	log.Printf("QuickLink listening on %s", addr)
 	log.Fatal(http.ListenAndServe(addr, handler))
 }
