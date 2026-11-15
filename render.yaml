@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: quicklink
+    runtime: go
+    plan: free
+    buildCommand: go build -o quicklink .
+    startCommand: ./quicklink
+    healthCheckPath: /health
+    envVars:
+      - key: QUICKLINK_DATA_DIR
+        value: /tmp/quicklink
