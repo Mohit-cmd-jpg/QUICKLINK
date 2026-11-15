@@ -126,7 +126,12 @@ func (s *server) routes() (http.Handler, error) {
 		return nil, fmt.Errorf("load web files: %w", err)
 	}
 	mux := http.NewServeMux()
-	mux.Handle("/", http.FileServer(http.FS(web)))
+	static := http.FileServer(http.FS(web))
+	mux.HandleFunc("GET /style.css", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/css; charset=utf-8")
+		static.ServeHTTP(w, r)
+	})
+	mux.Handle("/", static)
 	mux.HandleFunc("GET /health", s.health)
 	mux.HandleFunc("POST /api/urls", s.createURL)
 	mux.HandleFunc("GET /api/urls/{code}/stats", s.stats)
